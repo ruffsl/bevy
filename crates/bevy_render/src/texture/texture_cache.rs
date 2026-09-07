@@ -96,7 +96,19 @@ impl TextureCache {
                 texture.taken = false;
             }
 
-            textures.retain(|texture| texture.frames_since_last_use < 3);
+            textures.retain(|texture| {
+                let keep = texture.frames_since_last_use < 3;
+                if !keep {
+                    // Release the GPU memory now rather than on `Drop`: the
+                    // `webgpu` backend of wgpu frees a dropped texture only when
+                    // the JS garbage collector reaches its handle, which for a
+                    // large render target can be never in practice. An evicted
+                    // entry has been unused for 3 frames, so nothing in flight
+                    // references it.
+                    texture.texture.destroy();
+                }
+                keep
+            });
             !textures.is_empty()
         });
     }
