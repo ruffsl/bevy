@@ -110,6 +110,9 @@ impl Default for Headers {
 /// - [`DEFAULT_PORT`] : 15702.
 /// - [`DEFAULT_RENDER_PORT`] : 15703. (when `bevy_render` is enabled)
 ///
+/// Each can be changed with [`with_address`](Self::with_address),
+/// [`with_port`](Self::with_port) and [`with_render_port`](Self::with_render_port).
+///
 pub struct RemoteHttpPlugin {
     /// The address that Bevy will bind to.
     address: IpAddr,
@@ -172,6 +175,14 @@ impl RemoteHttpPlugin {
     #[must_use]
     pub fn with_port(mut self, port: u16) -> Self {
         self.port = port;
+        self
+    }
+    /// Set the remote port that the server for the render sub-app will listen on.
+    ///
+    /// Only used when `bevy_render` is enabled.
+    #[must_use]
+    pub fn with_render_port(mut self, port: u16) -> Self {
+        self.render_port = port;
         self
     }
     /// Set the extra headers that the response will include.
